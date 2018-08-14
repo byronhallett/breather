@@ -10,17 +10,13 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
-          // This is the theme of your application.
-          //
-          // Try running your application with "flutter run". You'll see the
-          // application has a blue toolbar. Then, without quitting the app, try
-          // changing the primarySwatch below to Colors.green and then invoke
-          // "hot reload" (press "r" in the console where you ran "flutter run",
-          // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-          // counter didn't reset back to zero; the application is not restarted.
-          primarySwatch: Colors.deepOrange,
-          scaffoldBackgroundColor: Colors.deepPurple,
-          textTheme: TextTheme(display1: TextStyle(color: Colors.white))),
+        primarySwatch: Colors.deepOrange,
+        scaffoldBackgroundColor: Colors.deepPurple,
+        textTheme: TextTheme(
+          display1: TextStyle(color: Colors.white),
+          button: TextStyle(color: Colors.white, fontSize: 28.0),
+        ),
+      ),
       home: new MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -61,19 +57,19 @@ class _MyHomePageState extends State<MyHomePage> {
       _totalDuration = timer.tick * timerPeriod.inMilliseconds;
       _latestDuration += timerPeriod.inMilliseconds;
     });
-    if (_totalDuration == fullTime) {
+    if (_totalDuration >= fullTime) {
       timer.cancel();
     }
   }
 
-  void startTimer() {
+  void _startTimer() {
     if (_timer != null) {
       _timer.cancel();
     }
     _timer = new Timer.periodic(timerPeriod, _updateTimes);
   }
 
-  void stopTimer() {
+  void _stopTimer() {
     if (_timer != null) {
       _timer.cancel();
     }
@@ -81,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _setBreathIn(TapUpDetails tap) {
-    if (_totalDuration == fullTime) {
+    if (_totalDuration >= fullTime) {
       return;
     }
     // if latest duration is non zero, add it to the exhales
@@ -96,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _setBreathOut(TapDownDetails tap) {
-    if (_totalDuration == fullTime) {
+    if (_totalDuration >= fullTime) {
       return;
     }
     // if the latest duration is non zero, add it to the inhales)
@@ -107,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _latestDuration = 0;
       });
     if (_timer == null) {
-      startTimer();
+      _startTimer();
     }
   }
 
@@ -117,19 +113,19 @@ class _MyHomePageState extends State<MyHomePage> {
       _exhaleDurations.clear();
       _latestDuration = 0;
       _totalDuration = 0;
-      stopTimer();
+      _stopTimer();
     });
   }
 
-  int sumFunc(int a, int b) {
+  int _sumFunc(int a, int b) {
     return a + b;
   }
 
-  double computeAverage(List<int> xs) {
+  double _computeAverage(List<int> xs) {
     if (xs.length == 0) {
       return 0.0;
     }
-    int sum = xs.reduce(sumFunc);
+    int sum = xs.reduce(_sumFunc);
     return sum / xs.length;
   }
 
@@ -143,8 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
       dur = 1.0;
     }
     double cpm = _inhaleDurations.length / dur;
-    double inhales = computeAverage(_inhaleDurations) / 1000;
-    double exhales = computeAverage(_exhaleDurations) / 1000;
+    double inhales = _computeAverage(_inhaleDurations) / 1000;
+    double exhales = _computeAverage(_exhaleDurations) / 1000;
 
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
@@ -159,9 +155,29 @@ class _MyHomePageState extends State<MyHomePage> {
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              new Text(
-                'begin with exhale',
-                style: Theme.of(context).textTheme.display1,
+              new Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[
+                  new Expanded(
+                    child: new FloatingActionButton(
+                      child: new Icon(Icons.save),
+                    ),
+                  ),
+                  new Expanded(
+                    child: new FloatingActionButton(
+                      onPressed: _resetState,
+                      child: new Icon(Icons.restore),
+                    ),
+                  ),
+                  new Expanded(
+                    child: new FloatingActionButton(
+                      child: new Icon(Icons.pause),
+                    ),
+                  ),
+                ],
+              ),
+              new Padding(
+                padding: EdgeInsets.all(16.0),
               ),
               new Text(
                 'average inhale: ${inhales.toStringAsFixed(1)}',
@@ -176,20 +192,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: Theme.of(context).textTheme.display1,
               ),
               new Text(
-                '''cycles per minute: 
-                ${cpm.toStringAsFixed(1)}''',
+                'cycles per min: ${cpm.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.display1,
+              ),
+              new Container(
+                height: 200.0,
+                width: 300.0,
+                margin: EdgeInsets.all(24.0),
+                decoration: ShapeDecoration(
+                    color: Colors.deepOrange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(36.0),
+                      ),
+                    )),
+                child: new Center(
+                  child: new Text(
+                    '''press while exhaling, release while inhaling''',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.button,
+                  ),
+                ),
               ),
             ],
           ),
         ),
       ),
-
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _resetState,
-        tooltip: 'Increment',
-        child: new Icon(Icons.restore),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
