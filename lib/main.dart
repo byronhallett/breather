@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Breather',
       theme: new ThemeData(
         primarySwatch: Colors.deepOrange,
         scaffoldBackgroundColor: Colors.deepPurple,
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           button: TextStyle(color: Colors.white, fontSize: 28.0),
         ),
       ),
-      home: new MyHomePage(title: 'Flutter Demo Home Page'),
+      home: new MyHomePage(title: 'Breather'),
     );
   }
 }
@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _updateTimes(Timer timer) {
     // if timer has reached max, cancel the timer
     setState(() {
-      _totalDuration = timer.tick * timerPeriod.inMilliseconds;
+      _totalDuration += timerPeriod.inMilliseconds;
       _latestDuration += timerPeriod.inMilliseconds;
     });
     if (_totalDuration >= fullTime) {
@@ -117,6 +117,10 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _saveState() {
+
+  }
+
   int _sumFunc(int a, int b) {
     return a + b;
   }
@@ -160,6 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   new Expanded(
                     child: new FloatingActionButton(
+                      onPressed: _saveState,
                       child: new Icon(Icons.save),
                     ),
                   ),
@@ -171,6 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   new Expanded(
                     child: new FloatingActionButton(
+                      onPressed: _stopTimer,
                       child: new Icon(Icons.pause),
                     ),
                   ),
