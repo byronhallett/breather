@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
+import 'vibration.dart';
 
-void main() => runApp(new MyApp());
+void main() {
+  SystemChrome
+      .setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    runApp(new MyApp());
+  });
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -43,7 +51,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const Duration timerPeriod =
       const Duration(milliseconds: 100); // 0.1 seconds
-  static const int fullTime = 1000 * 60 * 5; // 5 mins
+  // static const int fullTime = 1000 * 60 * 5; // 5 mins
+  static const int fullTime = 1000 * 3; // 3 seconds
 
   List<int> _inhaleDurations = [];
   List<int> _exhaleDurations = [];
@@ -58,7 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _latestDuration += timerPeriod.inMilliseconds;
     });
     if (_totalDuration >= fullTime) {
-      timer.cancel();
+      // The timer has finished
+      _endTimer();
     }
   }
 
@@ -76,10 +86,16 @@ class _MyHomePageState extends State<MyHomePage> {
     _timer = null;
   }
 
+  void _endTimer() {
+    _timer.cancel();
+    Vibration.vibrate();
+  }
+
   void _setBreathIn(TapUpDetails tap) {
     if (_totalDuration >= fullTime) {
       return;
     }
+    HapticFeedback.lightImpact();
     // if latest duration is non zero, add it to the exhales
     // if durations are zero, start both timers
     if (_inhaleDurations.length == _exhaleDurations.length &&
@@ -95,6 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_totalDuration >= fullTime) {
       return;
     }
+    HapticFeedback.lightImpact();
     // if the latest duration is non zero, add it to the inhales)
     if (_inhaleDurations.length + 1 == _exhaleDurations.length &&
         _latestDuration > 0)
@@ -117,9 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _saveState() {
-
-  }
+  void _saveState() {}
 
   int _sumFunc(int a, int b) {
     return a + b;
@@ -150,68 +165,76 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new Scaffold(
-      body: new Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: new GestureDetector(
-          onTapDown: _setBreathOut,
-          onTapUp: _setBreathIn,
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new Flex(
-                direction: Axis.horizontal,
-                children: <Widget>[
-                  new Expanded(
-                    child: new FloatingActionButton(
-                      onPressed: _saveState,
-                      child: new Icon(Icons.save),
-                    ),
-                  ),
-                  new Expanded(
-                    child: new FloatingActionButton(
-                      onPressed: _resetState,
-                      child: new Icon(Icons.restore),
-                    ),
-                  ),
-                  new Expanded(
-                    child: new FloatingActionButton(
-                      onPressed: _stopTimer,
-                      child: new Icon(Icons.pause),
-                    ),
-                  ),
-                ],
-              ),
-              new Padding(
-                padding: EdgeInsets.all(16.0),
-              ),
-              new Text(
-                'average inhale: ${inhales.toStringAsFixed(1)}',
-                style: Theme.of(context).textTheme.display1,
-              ),
-              new Text(
-                'average exhale: ${exhales.toStringAsFixed(1)}',
-                style: Theme.of(context).textTheme.display1,
-              ),
-              new Text(
-                'time elapsed: ${(_totalDuration / 1000).toStringAsFixed(1)}',
-                style: Theme.of(context).textTheme.display1,
-              ),
-              new Text(
-                'cycles per min: ${cpm.toStringAsFixed(1)}',
-                style: Theme.of(context).textTheme.display1,
-              ),
-              new Container(
-                height: 200.0,
-                width: 300.0,
-                margin: EdgeInsets.all(24.0),
-                decoration: ShapeDecoration(
-                    color: Colors.deepOrange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(36.0),
+      body: new Flex(
+        direction: Axis.vertical,
+        children: <Widget>[
+          new Expanded(
+            child: new Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Flex(
+                  direction: Axis.horizontal,
+                  children: <Widget>[
+                    new Expanded(
+                      child: new FloatingActionButton(
+                        onPressed: _saveState,
+                        child: new Icon(Icons.save),
+                        elevation: -1.0,
                       ),
-                    )),
+                    ),
+                    new Expanded(
+                      child: new FloatingActionButton(
+                        onPressed: _resetState,
+                        child: new Icon(Icons.restore),
+                        elevation: -1.0,
+                      ),
+                    ),
+                    new Expanded(
+                      child: new FloatingActionButton(
+                        onPressed: _stopTimer,
+                        child: new Icon(Icons.pause),
+                        elevation: -1.0,
+                      ),
+                    ),
+                  ],
+                ),
+                new Padding(
+                  padding: EdgeInsets.all(22.0),
+                ),
+                new Text(
+                  'average inhale: ${inhales.toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.display1,
+                ),
+                new Text(
+                  'average exhale: ${exhales.toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.display1,
+                ),
+                new Text(
+                  'time elapsed: ${(_totalDuration / 1000).toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.display1,
+                ),
+                new Text(
+                  'cycles per min: ${cpm.toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.display1,
+                ),
+              ],
+            ),
+          ),
+          new Expanded(
+            child: new GestureDetector(
+              onTapDown: _setBreathOut,
+              onTapUp: _setBreathIn,
+              child: new Container(
+                margin: EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(16.0),
+                decoration: ShapeDecoration(
+                  color: Colors.deepOrange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(36.0),
+                    ),
+                  ),
+                ),
                 child: new Center(
                   child: new Text(
                     '''press while exhaling, release while inhaling''',
@@ -220,9 +243,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
