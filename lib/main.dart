@@ -51,8 +51,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const Duration timerPeriod =
       const Duration(milliseconds: 100); // 0.1 seconds
-  // static const int fullTime = 1000 * 60 * 5; // 5 mins
-  static const int fullTime = 1000 * 3; // 3 seconds
+  static const int fullTime = 1000 * 60 * 5; // 5 mins
+  // static const int fullTime = 1000 * 3; // 3 seconds
 
   List<int> _inhaleDurations = [];
   List<int> _exhaleDurations = [];
@@ -81,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _stopTimer() {
     if (_timer != null) {
+      HapticFeedback.lightImpact();
       _timer.cancel();
     }
     _timer = null;
@@ -125,6 +126,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _resetState() {
+    if (_totalDuration > 0) {
+      HapticFeedback.lightImpact();
+    }
     setState(() {
       _inhaleDurations.clear();
       _exhaleDurations.clear();
@@ -134,7 +138,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _saveState() {}
+  void _saveState() {
+    // HapticFeedback.lightImpact();
+  }
 
   int _sumFunc(int a, int b) {
     return a + b;
