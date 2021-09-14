@@ -81,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _stopTimer() {
     if (_timer != null) {
-      HapticFeedback.lightImpact();
+      HapticFeedback.vibrate();
       _timer.cancel();
     }
     _timer = null;
@@ -96,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_totalDuration >= fullTime) {
       return;
     }
-    HapticFeedback.lightImpact();
+    HapticFeedback.vibrate();
     // if latest duration is non zero, add it to the exhales
     // if durations are zero, start both timers
     if (_inhaleDurations.length == _exhaleDurations.length &&
@@ -112,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_totalDuration >= fullTime) {
       return;
     }
-    HapticFeedback.lightImpact();
+    HapticFeedback.vibrate();
     // if the latest duration is non zero, add it to the inhales)
     if (_inhaleDurations.length + 1 == _exhaleDurations.length &&
         _latestDuration > 0)
@@ -127,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _resetState() {
     if (_totalDuration > 0) {
-      HapticFeedback.lightImpact();
+      HapticFeedback.vibrate();
     }
     setState(() {
       _inhaleDurations.clear();
@@ -139,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _saveState() {
-    // HapticFeedback.lightImpact();
+    // HapticFeedback.vibrate();
   }
 
   int _sumFunc(int a, int b) {
